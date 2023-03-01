@@ -7,6 +7,7 @@ import com.atguigu.domain.TableProcess;
 import org.apache.commons.math3.fitting.leastsquares.EvaluationRmsChecker;
 import org.apache.flink.api.common.state.BroadcastState;
 import org.apache.flink.api.common.state.MapStateDescriptor;
+import org.apache.flink.api.common.state.ReadOnlyBroadcastState;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.co.BroadcastProcessFunction;
@@ -31,6 +32,11 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
 
     @Override
     public void processElement(JSONObject value, ReadOnlyContext ctx, Collector<JSONObject> collector) throws Exception {
+
+        //获取广播的配置数据
+        ReadOnlyBroadcastState<String, TableProcess> broadcastState = ctx.getBroadcastState(this.mapStateDescriptor);
+
+        TableProcess tableProcess = broadcastState.get(value.getString("table"));
 
     }
 
