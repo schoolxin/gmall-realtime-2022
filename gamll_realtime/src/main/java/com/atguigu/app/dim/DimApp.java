@@ -21,7 +21,7 @@ import org.apache.flink.util.Collector;
 
 public class DimApp {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         //TODO 1.获取执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1); //生产环境中设置为Kafka主题的分区数
@@ -71,7 +71,10 @@ public class DimApp {
         BroadcastConnectedStream<JSONObject, String> broadcastConnectedStream = filterJsonObjDS.connect(broadcastStream);
         //处理连接流
         SingleOutputStreamOperator<JSONObject> dimDS = broadcastConnectedStream.process(new TableProcessFunction(mapStateDescriptor));
+        dimDS.print(">>>>>>");
         //将数据输出到phoenix
 //        dimDS.addSink();
+
+        env.execute();
     }
 }
