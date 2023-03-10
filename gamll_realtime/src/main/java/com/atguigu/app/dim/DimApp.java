@@ -74,7 +74,6 @@ public class DimApp {
         dimDS.print(">>>>>>");
         //将数据输出到phoenix
 //        dimDS.addSink();
-
         env.execute();
     }
 }
