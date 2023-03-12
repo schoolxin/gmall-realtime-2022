@@ -29,7 +29,6 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
     private Connection cnn;
 
 
-
     public TableProcessFunction(MapStateDescriptor<String, TableProcess> mapStateDescriptor) {
         this.mapStateDescriptor = mapStateDescriptor;
     }
@@ -44,15 +43,13 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
         TableProcess tableProcess = broadcastState.get(table);
 
         //过滤字段
-        if (tableProcess!=null)
-        {
-            filterColumns(value.getJSONObject("data"),tableProcess.getSinkColumns());
+        if (tableProcess != null) {
+            filterColumns(value.getJSONObject("data"), tableProcess.getSinkColumns());
             //添加sinkTable
-            value.put("sinkTable",tableProcess.getSinkTable());
+            value.put("sinkTable", tableProcess.getSinkTable());
             out.collect(value);
 
-        }else
-        {
+        } else {
             System.out.println("找不到对应的Key：" + table);
         }
 
@@ -61,7 +58,8 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
 
     /**
      * 过滤字段
-     * @param data {"id":"A001","name":"dd","tname":"dd"}
+     *
+     * @param data        {"id":"A001","name":"dd","tname":"dd"}
      * @param sinkColumns "id,name"
      */
     private void filterColumns(JSONObject data, String sinkColumns) {
@@ -69,11 +67,9 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
         String[] columnsArr = sinkColumns.split(",");
         List<String> columnsList = Arrays.asList(columnsArr);
         Iterator<Map.Entry<String, Object>> dataIter = data.entrySet().iterator();
-        while (dataIter.hasNext())
-        {
+        while (dataIter.hasNext()) {
             Map.Entry<String, Object> objectEntry = dataIter.next();
-            if(!columnsList.contains(objectEntry.getKey()))
-            {
+            if (!columnsList.contains(objectEntry.getKey())) {
                 dataIter.remove();
             }
         }
@@ -89,10 +85,9 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
     }
 
 
-
+    //value:{"before":null,"after":{"source_table":"aa","sink_table":"bb","sink_columns":"cc","sink_pk":"id","sink_extend":"xxx"},"source":{"version":"1.5.4.Final","connector":"mysql","name":"mysql_binlog_source","ts_ms":1652513039549,"snapshot":"false","db":"gmall-211126-config","sequence":null,"table":"table_process","server_id":0,"gtid":null,"file":"","pos":0,"row":0,"thread":null,"query":null},"op":"r","ts_ms":1652513039551,"transaction":null}
     @Override
     public void processBroadcastElement(String value, Context ctx, Collector<JSONObject> collector) throws Exception {
-
 
 
         JSONObject jsonObject = JSON.parseObject(value); //将字符串转为 json对象
@@ -111,12 +106,9 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
         broadcastState.put(tableProcess.getSourceTable(), tableProcess);
 
 
-
-
     }
 
     /**
-     *
      * @param sinkTable
      * @param sinkColumns
      * @param sinkPk
@@ -124,17 +116,15 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
      */
     private void checkTable(String sinkTable, String sinkColumns, String sinkPk, String sinkExtend) {
 
-        PreparedStatement pst=null;
+        PreparedStatement pst = null;
 
         try {
             //处理特殊字段
-            if (sinkPk==null||"".equals(sinkPk))
-            {
-                sinkPk="id";
+            if (sinkPk == null || "".equals(sinkPk)) {
+                sinkPk = "id";
             }
-            if (sinkExtend==null)
-            {
-                sinkExtend="";
+            if (sinkExtend == null) {
+                sinkExtend = "";
             }
 
             //拼接sql
@@ -154,16 +144,13 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
                 //取出字段
                 String column = columns[i];
                 //判断取出来的字段是否为主键
-                if (sinkPk.equals(column))
-                {
+                if (sinkPk.equals(column)) {
                     createTableSql.append(column).append(" varchar primary key");
-                }else
-                {
+                } else {
                     createTableSql.append(column).append(" varchar");
                 }
                 //判断是否为最后一个字段
-                if (i<columns.length-1)
-                {
+                if (i < columns.length - 1) {
                     createTableSql.append(",");
                 }
 
@@ -172,7 +159,7 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
             createTableSql.append(")").append(sinkExtend);
             //编译sql
 
-            System.out.println("建表语句"+createTableSql);
+            System.out.println("建表语句" + createTableSql);
 
             pst = cnn.prepareStatement(createTableSql.toString());
             //执行sql
@@ -180,12 +167,11 @@ public class TableProcessFunction extends BroadcastProcessFunction<JSONObject, S
 
         } catch (SQLException e) {
 
-            throw new RuntimeException("建表失败"+sinkTable); //手动抛出运行时异常 一旦报错 程序就退出了
+            throw new RuntimeException("建表失败" + sinkTable); //手动抛出运行时异常 一旦报错 程序就退出了
         } finally {
 
             //释放资源
-            if(pst!=null)
-            {
+            if (pst != null) {
                 try {
                     pst.close();
                 } catch (SQLException e) {

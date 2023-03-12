@@ -1,6 +1,7 @@
 package com.atguigu.app.dim;
 
 import com.alibaba.fastjson.JSONObject;
+import com.atguigu.app.func.DimSinkFunction;
 import com.atguigu.app.func.TableProcessFunction;
 import com.atguigu.domain.TableProcess;
 import com.atguigu.utils.MyKafkaUtil;
@@ -73,7 +74,7 @@ public class DimApp {
         SingleOutputStreamOperator<JSONObject> dimDS = broadcastConnectedStream.process(new TableProcessFunction(mapStateDescriptor));
         dimDS.print(">>>>>>");
         //将数据输出到phoenix
-//        dimDS.addSink();
+        dimDS.addSink(new DimSinkFunction());
         env.execute();
     }
 }
