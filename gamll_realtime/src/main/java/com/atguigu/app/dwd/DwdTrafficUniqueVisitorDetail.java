@@ -7,8 +7,10 @@ import com.atguigu.utils.DateFormatUtil;
 import com.atguigu.utils.MyKafkaUtil;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.RichFilterFunction;
+import org.apache.flink.api.common.state.StateTtlConfig;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
+import org.apache.flink.api.common.time.Time;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
@@ -62,7 +64,14 @@ public class DwdTrafficUniqueVisitorDetail {
             @Override
             public void open(Configuration parameters) throws Exception {
                 super.open(parameters);
-                lastVistDate = getRuntimeContext().getState(new ValueStateDescriptor<String>("lastVisite", String.class));
+                StateTtlConfig stateTtlConfig = new StateTtlConfig
+                        .Builder(Time.days(1))  //设置过期时间
+                        .setUpdateType(StateTtlConfig.UpdateType.OnCreateAndWrite) //设置更新方式 也就是重置方式 状态创建或更新时   同时更新过期时间
+                        .build();
+                ValueStateDescriptor<String> stateDescriptor = new ValueStateDescriptor<>("lastVisite", String.class);
+                stateDescriptor.enableTimeToLive(stateTtlConfig);
+                lastVistDate = getRuntimeContext().getState(stateDescriptor);
+
             }
 
             @Override
