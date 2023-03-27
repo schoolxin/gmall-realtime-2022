@@ -45,6 +45,7 @@ public class DwdTrafficUserJumpDetail {
                         .withTimestampAssigner(new SerializableTimestampAssigner<JSONObject>() {
                             @Override
                             public long extractTimestamp(JSONObject element, long recordTimestamp) {
+                                System.out.println(element.getLong("ts"));
                                 return element.getLong("ts");
                             }
                         }))
@@ -66,7 +67,7 @@ public class DwdTrafficUserJumpDetail {
         PatternStream<JSONObject> patternStream = CEP.pattern(keyedStream, jsonObjectPattern);
 
         //TODO 提取事件(匹配上的和超时的)
-        OutputTag<String> outTag = new OutputTag<>("timeOut");
+        OutputTag<String> outTag = new OutputTag<String>("timeOut"){};
         SingleOutputStreamOperator<String> selectDS = patternStream.select(outTag, new PatternTimeoutFunction<JSONObject, String>() {
                     @Override
                     public String timeout(Map<String, List<JSONObject>> map, long l) throws Exception {
