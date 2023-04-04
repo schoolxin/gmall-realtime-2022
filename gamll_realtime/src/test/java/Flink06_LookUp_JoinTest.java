@@ -28,7 +28,7 @@ public class Flink06_LookUp_JoinTest {
                 "  'table-name' = 'base_dic', " +
                 "  'driver' = 'com.mysql.cj.jdbc.Driver', " +
                 "  'lookup.cache.max-rows' = '10', " +  //维表数据不变or会改变,但是数据的准确度要求不高 缓存10条
-                "  'lookup.cache.ttl' = '1 hour', " + //这个和上面的最大行数 必须同时写
+                "  'lookup.cache.ttl' = '1 hour', " +
                 "  'username' = 'root', " +
                 "  'password' = '000000' " +
                 ")");
