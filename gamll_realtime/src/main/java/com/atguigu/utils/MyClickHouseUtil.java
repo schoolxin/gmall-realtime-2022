@@ -23,6 +23,7 @@ public class MyClickHouseUtil {
                     @Override
                     public void accept(PreparedStatement preparedStatement, T t) throws SQLException {
 
+
                         //使用反射的方式获取t对象中的方法
                         Class<?> tClz = t.getClass();
 //                        Method[] methods = tClz.getMethods();

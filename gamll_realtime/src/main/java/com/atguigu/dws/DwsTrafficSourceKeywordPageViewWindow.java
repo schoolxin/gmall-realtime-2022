@@ -72,7 +72,11 @@ public class DwsTrafficSourceKeywordPageViewWindow {
         keywordBeanDataStream.addSink(
                 MyClickHouseUtil.getSinkFunction("insert into dws_traffic_source_keyword_page_view_window values(?,?,?,?,?,?)")
         );
+//        tblEnv.createTemporaryView("resultTable",resultTable);
+        // 创建输出到clickhouse的表  目前flink 官方不支持clickhouse的jdbc链接器 所以目前只能按流的方式写出
+//        tblEnv.executeSql("create table dws_traffic_source_keyword_page_view_window() with ('connector' = 'jdbc', )");
 
+//        tblEnv.executeSql("insert into select * from resultTable");
         //TODO 8.启动任务
         env.execute("DwsTrafficSourceKeywordPageViewWindow");
 
